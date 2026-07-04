@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 
 import '../../controllers/questionnaire_controller.dart';
@@ -53,7 +54,6 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
                           ),
 
                           const SizedBox(height: 15),
-
                           ...question.options.map(
                             (option) => Obx(
                               () => RadioListTile<String>(
@@ -75,36 +75,32 @@ class _QuestionnaireScreenState extends State<QuestionnaireScreen> {
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (!controller.isAllQuestionsAnswered()) {
-                      Get.snackbar(
-                        "Incomplete",
-                        "Please answer all questions.",
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                      return;
-                    }
-
-                    /// Next Step
-                    /// Save in Hive
-                    /// Save DateTime
-                    /// Save Lat Long
-
-                    Get.snackbar(
-                      "Success",
-                      "Questionnaire Submitted",
-                      snackPosition: SnackPosition.BOTTOM,
-                    );
-
-                    Get.back();
-                  },
-                  child: const Text("Submit", style: TextStyle(fontSize: 18)),
+            Obx(
+              () => Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 52,
+                  child: ElevatedButton(
+                    onPressed: controller.isSubmitting.value
+                        ? null
+                        : () async {
+                            await controller.submitQuestionnaire();
+                          },
+                    child: controller.isSubmitting.value
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 3,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Submit', style: TextStyle(fontSize: 18)),
+                  ),
                 ),
               ),
             ),

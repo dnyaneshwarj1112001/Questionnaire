@@ -59,7 +59,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 40),
 
-                // Phone Number Field
                 CustomeTextfield(
                   onChanged: (_) {
                     authController.validateForm(
@@ -70,6 +69,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                   inputformaters: [LengthLimitingTextInputFormatter(10)],
                   obscureText: false,
+                  keybordtype: TextInputType.number,
                   iconData: Icons.phone,
                   controller: phoneController,
                   labletext: AppStrigs.phoneNumber,

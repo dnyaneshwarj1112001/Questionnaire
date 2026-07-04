@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutterquationnaireapp/controllers/auth_controller.dart';
+import 'package:flutterquationnaireapp/core/constants/Appcolors.dart';
 import 'package:flutterquationnaireapp/routes/app_routes.dart';
-import 'package:flutterquationnaireapp/views/auth/sreens/login_screen.dart';
-import 'package:flutterquationnaireapp/views/auth/sreens/register_screen.dart';
-import 'package:flutterquationnaireapp/views/auth/sreens/splash_screen.dart';
-import 'package:flutterquationnaireapp/views/home/home_screen.dart';
-import 'package:flutterquationnaireapp/views/questionnaire/questionnaire_screen.dart';
+import 'package:flutterquationnaireapp/routes/app_pages.dart';
+// Route pages are provided by `app_pages.dart`
 import 'package:get/get.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
@@ -28,20 +26,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: AppRoutes.splash,
-      getPages: [
-        GetPage(name: AppRoutes.splash, page: () => SplashScreen()),
-        GetPage(name: AppRoutes.register, page: () => RegisterScreen()),
-        GetPage(name: AppRoutes.login, page: () => LoginScreen()),
-        GetPage(name: AppRoutes.home, page: () => HomeScreen()),
-        GetPage(
-          name: AppRoutes.questionnaire,
-          page: () => QuestionnaireScreen(),
-        ),
-      ],
+      getPages: appPages,
       title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
+      theme: Appcolors.theme,
     );
   }
 }

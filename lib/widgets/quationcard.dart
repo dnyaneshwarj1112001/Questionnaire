@@ -15,16 +15,16 @@ class QuestionnaireCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 5,
-      margin: const EdgeInsets.symmetric(vertical: 10),
+      elevation: 3,
+      margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(15),
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(16),
           child: Row(
             children: [
               CircleAvatar(
@@ -62,7 +62,7 @@ class QuestionnaireCard extends StatelessWidget {
                 ),
               ),
 
-              const Icon(Icons.arrow_forward_ios)
+              const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.grey)
             ],
           ),
         ),

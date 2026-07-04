@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutterquationnaireapp/core/constants/AppStrgs.dart';
 import 'package:flutterquationnaireapp/routes/app_routes.dart';
 import 'package:get/get.dart';
 
@@ -43,7 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Login"), centerTitle: true),
+      appBar: AppBar(title: const Text(AppStrigs.login), centerTitle: true),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -63,7 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
 
                 const Text(
-                  "Welcome Back",
+                  AppStrigs.welcomeback,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                 ),
@@ -71,18 +72,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
 
                 const Text(
-                  "Login to continue",
+                  AppStrigs.logintocontinue,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.grey),
                 ),
 
                 const SizedBox(height: 40),
 
-                /// Phone
                 CustomeTextfield(
                   controller: phoneController,
                   obscureText: false,
-                  labletext: "Phone Number",
+                  labletext: AppStrigs.phoneNumber,
                   iconData: Icons.phone,
                   keybordtype: TextInputType.phone,
                   inputformaters: [
@@ -92,11 +92,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   onChanged: (_) => validateForm(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter phone number";
+                      return AppStrigs.pleaseEnterPhoneNumber;
                     }
 
                     if (!RegExp(r'^[0-9]{10}$').hasMatch(value)) {
-                      return "Enter valid phone number";
+                      return AppStrigs.entervalidphoneNumber;
                     }
 
                     return null;
@@ -105,20 +105,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 20),
 
-                /// Password
                 TextFormField(
                   controller: passwordController,
                   obscureText: obscurePassword,
                   onChanged: (_) => validateForm(),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return "Please enter password";
+                      return AppStrigs.pleaseEnterPassWord;
                     }
 
                     return null;
                   },
                   decoration: InputDecoration(
-                    labelText: "Password",
+                    labelText: AppStrigs.password,
                     prefixIcon: const Icon(Icons.lock),
                     border: const OutlineInputBorder(),
                     suffixIcon: IconButton(
@@ -138,7 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 30),
 
-                /// Login Button
                 Obx(
                   () => ElevatedButton(
                     onPressed: authController.isLoginValid.value
@@ -156,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
                     child: const Text(
-                      "LOGIN",
+                      AppStrigs.loginButton,
                       style: TextStyle(color: Colors.white, fontSize: 16),
                     ),
                   ),
@@ -167,13 +165,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text("Don't have an account?"),
+                    const Text(AppStrigs.dontHaveAccount),
 
                     TextButton(
                       onPressed: () {
                         Get.offNamed(AppRoutes.register);
                       },
-                      child: const Text("Register"),
+                      child: const Text(AppStrigs.register),
                     ),
                   ],
                 ),

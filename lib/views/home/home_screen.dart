@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutterquationnaireapp/routes/app_routes.dart';
-import 'package:flutterquationnaireapp/widgets/quationcard.dart';
+import 'package:flutterquationnaireapp/core/constants/AppStrgs.dart';
+import 'package:flutterquationnaireapp/core/constants/Appcolors.dart';
 import 'package:get/get.dart';
 
 import '../../controllers/auth_controller.dart';
 import '../../controllers/questionnaire_controller.dart';
+import '../../routes/app_routes.dart';
+import '../../widgets/quationcard.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -17,8 +19,24 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Questionnairessss"), centerTitle: true),
-
+      appBar: AppBar(
+        title: const Text(AppStrigs.home),
+        centerTitle: true,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              backgroundColor: Appcolors.cwhite,
+              child: IconButton(
+                icon: const Icon(Icons.person, color: Appcolors.logoiconcolor),
+                onPressed: () {
+                  Get.toNamed(AppRoutes.profile);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Obx(() {
@@ -28,7 +46,6 @@ class HomeScreen extends StatelessWidget {
 
           return ListView.builder(
             itemCount: questionnaireController.questionnaires.length,
-
             itemBuilder: (context, index) {
               final questionnaire =
                   questionnaireController.questionnaires[index];
@@ -36,12 +53,27 @@ class HomeScreen extends StatelessWidget {
               return QuestionnaireCard(
                 title: questionnaire.title,
                 description: questionnaire.description,
+                onTap: () async {
+                  questionnaireController.loadQuestions(
+                    questionnaire.id,
+                    questionnaire.title,
+                  );
 
-                onTap: () {
-                  questionnaireController.loadQuestions(questionnaire.id);
+                  final result = await Get.toNamed(
+                    AppRoutes.questionnaire,
+                    arguments: questionnaire.title,
+                  );
 
-                  // Navigate later
-                  Get.toNamed(AppRoutes.questionnaire);
+                  if (result == true) {
+                    Get.snackbar(
+                      AppStrigs.successful,
+                      AppStrigs.questionnairesubmittedsuccessfully,
+                      snackPosition: SnackPosition.TOP,
+                      backgroundColor: Colors.green,
+                      colorText: Colors.white,
+                      duration: const Duration(seconds: 2),
+                    );
+                  }
                 },
               );
             },

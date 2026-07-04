@@ -45,10 +45,19 @@ class _SplashScreenState extends State<SplashScreen> {
                 color: const Color(0xffF3F0FF),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.assignment_turned_in_rounded,
-                size: 80,
-                color: Color(0xff6A4CF4),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Image.asset(
+                  'assets/icons/app_icon.png',
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Icon(
+                      Icons.assignment_turned_in_rounded,
+                      size: 80,
+                      color: Color(0xff6A4CF4),
+                    );
+                  },
+                ),
               ),
             ),
 

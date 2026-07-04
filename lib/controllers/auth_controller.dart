@@ -1,98 +1,104 @@
-import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:flutterquationnaireapp/core/constants/AppStrgs.dart';
-import 'package:flutterquationnaireapp/core/constants/Appcolors.dart';
+import 'package:flutterquationnaireapp/data/models/user_model.dart';
+import 'package:flutterquationnaireapp/data/models/submission_model.dart';
+import 'package:flutterquationnaireapp/data/repositories/auth_repository.dart';
+import 'package:flutterquationnaireapp/data/repositories/submission_repositories.dart';
 import 'package:flutterquationnaireapp/routes/app_routes.dart';
 import 'package:flutterquationnaireapp/utilities/appsnackbar.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-
-import '../data/models/user_model.dart';
 
 class AuthController extends GetxController {
-  final Box _authBox = Hive.box('authBox');
-  var isLoggedIn = false.obs;
+  final AuthRepository _repository = AuthRepository();
+  final SubmissionRepository _submissionRepository = SubmissionRepository();
 
-  var currentPositionUser =
-      ''.obs; // To store logged-in phone/email for profile
+  RxBool isLoggedIn = false.obs;
   RxBool isFormValid = false.obs;
   RxBool isLoginValid = false.obs;
+
+  RxString currentPositionUser = ''.obs;
+  RxInt totalSubmissions = 0.obs;
+
+  RxList<SubmissionModel> submissionHistory = <SubmissionModel>[].obs;
+
   @override
   void onInit() {
     super.onInit();
-    isLoggedIn.value = _authBox.get('isLoggedIn', defaultValue: false);
+    loadProfile();
+  }
+
+  void loadProfile() {
+    isLoggedIn.value = _repository.isLoggedIn();
+
     if (isLoggedIn.value) {
-      currentPositionUser.value = _authBox.get(
-        'currentUserPhone',
-        defaultValue: '',
+      currentPositionUser.value = _repository.getCurrentUserPhone();
+
+      totalSubmissions.value = _submissionRepository.getSubmissionCount(
+        currentPositionUser.value,
       );
+      submissionHistory.assignAll(
+        _submissionRepository.getSubmissionsByPhone(currentPositionUser.value),
+      );
+    } else {
+      currentPositionUser.value = "";
+      totalSubmissions.value = 0;
+      submissionHistory.clear();
     }
   }
 
-  void registerUser(String phone, String password, String confirmPassword) {
-    UserModel newUser = UserModel(phone: phone, password: password);
-    String userJson = jsonEncode(newUser.toJson());
-
-    _authBox.put(phone, userJson);
-    AppSnackbar.success(
-      AppStrigs.registrationSuccessful,
-      AppStrigs.accountcreated,
-    );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      Get.offAllNamed(AppRoutes.login);
-    });
+  Future<void> registerUser(
+    String phone,
+    String password,
+    String confirmPassword,
+  ) async {
+    bool success = await _repository.registerUser(phone, password);
+    if (success) {
+      AppSnackbar.success(
+        AppStrigs.registrationSuccessful,
+        AppStrigs.accountcreated,
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        Get.offAllNamed(AppRoutes.login);
+      });
+    } else {
+      AppSnackbar.error(AppStrigs.error, "User already exists.");
+    }
   }
 
-  // login user logic
-  void loginUser(String phone, String password) {
+  Future<void> loginUser(String phone, String password) async {
     if (phone.isEmpty || password.isEmpty) {
       AppSnackbar.error(AppStrigs.error, AppStrigs.pleasefillallthefields);
       return;
     }
-    String? userString = _authBox.get(phone);
 
-    if (userString == null) {
+    UserModel? user = _repository.getUser(phone);
+    if (user == null) {
       AppSnackbar.error(AppStrigs.error, AppStrigs.userNotfound);
       return;
     }
-    Map<String, dynamic> userMap = jsonDecode(userString);
-    UserModel user = UserModel.fromJson(userMap);
 
-    if (user.password == password) {
-      _authBox.put('isLoggedIn', true);
-      _authBox.put('currentUserPhone', phone);
-
-      isLoggedIn.value = true;
-      currentPositionUser.value = phone;
-      AppSnackbar.success(AppStrigs.successful, AppStrigs.welcomeback);
-      Get.offNamed(AppRoutes.home);
-    } else {
+    if (user.password != password) {
       AppSnackbar.error(AppStrigs.error, AppStrigs.incorrectpassword);
+      return;
     }
+
+    await _repository.saveLoginSession(phone);
+    loadProfile();
+    AppSnackbar.success(AppStrigs.successful, AppStrigs.welcomeback);
+    Get.offNamed(AppRoutes.home);
   }
 
-  // --- LOGOUT LOGIC ---
-  void logout() {
-    _authBox.put('isLoggedIn', false);
-    _authBox.delete('currentUserPhone'); // Clear active session user
-
+  Future<void> logout() async {
+    await _repository.logout();
     isLoggedIn.value = false;
-    currentPositionUser.value = '';
-
-    Get.snackbar(
-      'Logged Out',
-      'Session cleared successfully',
-      snackPosition: SnackPosition.BOTTOM,
-    );
-
-    // Navigate back to login and remove all previous screens from stack
-    // Get.offAll(() => LoginScreen());
+    currentPositionUser.value = "";
+    totalSubmissions.value = 0;
+    submissionHistory.clear();
+    AppSnackbar.success("Logged Out", "Session cleared successfully");
+    Get.offAllNamed(AppRoutes.login);
   }
 
   void validateForm(String phone, String password, String confirmPassword) {
     isFormValid.value =
-        // RegExp(r'^[0-9]{10}$').hasMatch(phone) &&
         phone.isNotEmpty &&
         password.isNotEmpty &&
         confirmPassword.isNotEmpty &&
